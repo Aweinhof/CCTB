@@ -7,9 +7,13 @@ class Query:
 
     @staticmethod
     def crawl_sets() -> list[dict]:
-        index_url = "https://index.commoncrawl.org/collinfo.json"
-        indexes = json.loads(requests.get(index_url).text)
-        return indexes
+        try:
+            index_url = "https://index.commoncrawl.org/collinfo.json"
+            indexes = json.loads(requests.get(index_url).text)
+            return indexes
+
+        except Exception:
+            exit('Error: Connection refused')
 
     @staticmethod
     def filtered_indexes(crawlset: dict, url_pattern: str, *filters: FilterValue) -> list:
