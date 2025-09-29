@@ -30,7 +30,7 @@ def fetch_record(record):
     s3_url = f'https://data.commoncrawl.org/{record["filename"]}'
 
     # Define the byte range for the request
-    byte_range = f'bytes={offset}-{offset+length-1}'
+    byte_range = f'bytes={offset}-{offset + length - 1}'
 
     # Send the HTTP GET request to the S3 URL with the specified byte range
     response = requests.get(
