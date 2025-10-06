@@ -64,4 +64,10 @@ def build_parser():
 
     find_page_p.add_argument("regex", help="The regex to match a page")
 
+    # -------------------------------------- dev --------------------------------------
+
+    dev_p = subparsers.add_parser("dev", help="Developement branch")
+
+    # dev_p.add_argument("regex", help="The regex to match a page")
+
     return p

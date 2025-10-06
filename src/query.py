@@ -1,6 +1,9 @@
 import requests
 import json
 from src.datatypes.filter import FilterValue
+from pyathena import connect
+import pandas as pd
+import warnings
 
 
 class Query:
@@ -26,3 +29,21 @@ class Query:
         indexes = indexes[:-1] if not indexes[-1] else indexes
         indexes = [json.loads(index) for index in indexes]
         return indexes
+
+    @staticmethod
+    def contact_bucket():
+        warnings.filterwarnings("ignore", message="pandas only supports SQLAlchemy")
+
+        conn = connect(s3_staging_dir='s3://digit-cc-athena-query-results/',
+                       region_name='us-east-1',
+                       schema_name='ccindex')
+
+        sql = """
+        SELECT url, url_host_name, warc_filename
+        FROM ccindex.ccindex
+        WHERE url_host_name = 'ulb.be'
+        LIMIT 1
+        """
+
+        df = pd.read_sql(sql, conn)
+        print(df.head())

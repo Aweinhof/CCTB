@@ -24,7 +24,8 @@ class CCTB:
         not_exact = [Filter.NOT_EXACT(i) for i in not_exact]
         not_regex = [Filter.NOT_REGEX(i) for i in not_regex]
 
-        self.crawl_sets = Query.crawl_sets()
+        if not self.crawl_sets:
+            self.crawl_sets = Query.crawl_sets()
 
         return Query.filtered_indexes(self.crawl_sets[0], url_pattern,
                                       *contain,
@@ -37,3 +38,6 @@ class CCTB:
     def scan_chunk(self, path):
         scanner = ChunkScanner()
         scanner.scan(path)
+
+    def dev(self):
+        Query.contact_bucket()

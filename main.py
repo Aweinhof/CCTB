@@ -32,6 +32,11 @@ def find_page():
     cctb.scan_chunk('/home/csirc/Workspace/CCTB/junk/warc_type/CC-MAIN-20250905112101-20250905142101-00000.warc')
 
 
+def dev():
+    cctb = CCTB()
+    cctb.dev()
+
+
 def main(argv=None):
     argv = argv if argv is not None else sys.argv[1:]
     args = build_parser().parse_args(argv)
@@ -45,6 +50,9 @@ def main(argv=None):
 
         case "find_page":
             find_page()
+
+        case "dev":
+            dev()
 
 
 if __name__ == "__main__":
