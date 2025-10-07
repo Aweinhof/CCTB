@@ -1,10 +1,28 @@
+from pathlib import Path
+from src.query import Query
+import gzip
+import requests
+import time
+
+
 class ChunksParser:
     result = {}
     warc_type = 0
     robotstxt_type = 0
     crawldiagnostics_type = 0
 
-    def __init__(self, path):
+    def __init__(self, dataset_id):
+        Path('chunklist').mkdir(parents=True, exist_ok=True)
+        path = Path('chunklist/' + dataset_id)
+
+        if not path.exists():
+            try:
+                input('Index file for this dataset doesn\'t exist yet. Press enter if you want to download it (~35Mb)')
+                Query.fetch_chunks_indexes(dataset_id)
+            except Exception as e:
+                print("Error, probably invalid authentication token : ")
+                print(e)
+
         with open(path, 'r') as f:
             self.treat_chunks_file(f)
 
@@ -23,7 +41,7 @@ class ChunksParser:
         while line := f.readline():
             line = line.strip()
             splitted = line.split('-')
-            splitted[-1] = "xxxx.warc.gz"
+            splitted[-1] = "xxxxx.warc.gz"
             self.rec_stats(splitted[-5].split('/')[-2])
             line = "-".join(splitted)
             self.add_to_dict(line)

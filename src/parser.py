@@ -56,7 +56,7 @@ def build_parser():
 
     chunks_p = subparsers.add_parser("chunks", help="Parses a chunks index file to show stats of it")
 
-    chunks_p.add_argument("chunks_file", help="File containing the list of chunks")
+    chunks_p.add_argument("dataset_id", help="Name of the dataset, ex : CC-MAIN-2025-38")
 
     # ----------------------------------- find_page -----------------------------------
 

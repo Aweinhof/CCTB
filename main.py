@@ -23,7 +23,7 @@ def find(args):
 
 
 def chunks(args):
-    p = ChunksParser(args.chunks_file)
+    p = ChunksParser(args.dataset_id)
     p.print()
 
 

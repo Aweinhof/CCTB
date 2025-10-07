@@ -4,6 +4,8 @@ from src.datatypes.filter import FilterValue
 from pyathena import connect
 import pandas as pd
 import warnings
+import boto3
+from pathlib import Path
 
 
 class Query:
@@ -35,8 +37,8 @@ class Query:
         warnings.filterwarnings("ignore", message="pandas only supports SQLAlchemy")
 
         conn = connect(s3_staging_dir='s3://digit-cc-athena-query-results/',
-                       region_name='us-east-1',
-                       schema_name='ccindex')
+                    region_name='us-east-1',
+                    schema_name='ccindex')
 
         sql = """
         SELECT url, url_host_name, warc_filename
@@ -44,6 +46,29 @@ class Query:
         WHERE url_host_name = 'ulb.be'
         LIMIT 1
         """
-
+    
         df = pd.read_sql(sql, conn)
         print(df.head())
+
+    @staticmethod
+    def fetch_chunks_indexes(id):
+        Path('chunklist').mkdir(parents=True, exist_ok=True)
+
+        s3 = boto3.client('s3')
+        bucket = 'commoncrawl'
+        prefix = f'crawl-data/{id}/segments/'
+
+        warc_files = []
+
+        paginator = s3.get_paginator('list_objects_v2')
+        page_iterator = paginator.paginate(Bucket=bucket, Prefix=prefix)
+
+        for page in page_iterator:
+            for obj in page.get('Contents', []):
+                key = obj['Key']
+                if key.endswith('.warc.gz'):
+                    warc_files.append(key)
+
+        with open('chunklist/' + id, 'w') as f:
+            for line in warc_files:
+                f.write(line+'\n')
