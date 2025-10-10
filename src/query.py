@@ -5,6 +5,7 @@ from pyathena import connect
 from pyathena.pandas.cursor import PandasCursor
 import boto3
 from pathlib import Path
+from src.logger import log
 
 
 class Query:
@@ -24,7 +25,7 @@ class Query:
         index_server = crawlset['cdx-api']
         filters_url = "&".join([f.text for f in filters])
         URL = f'{index_server}?url={url_pattern}&{filters_url}&output=json'
-        print(URL, '\n')
+        log(URL + '\n')
         response = requests.get(URL, headers={'user-agent': 'cc-power-user/1.0'}).text
         indexes = response.split('\n')
         indexes = indexes[:-1] if not indexes[-1] else indexes
@@ -43,10 +44,9 @@ class Query:
             params[str(i + 1)] = values[i]
 
         df = cursor.execute(query, params).fetchall()
-        print(df)
         scanned_bytes = cursor.data_scanned_in_bytes or 0
-        print(scanned_bytes)
-        print(f"Data scanned: {scanned_bytes / 1e6:.2f} MB")
+        # TODO : make a cast to MB GB TB
+        log(f"Data scanned: {scanned_bytes / 1e6:.2f} MB")
 
     @staticmethod
     def fetch_chunks_indexes(id):

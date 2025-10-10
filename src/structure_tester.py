@@ -1,4 +1,5 @@
 from src.datatypes.warc_state import WarcState
+from src.logger import error
 
 
 class StructureTester:
@@ -25,6 +26,8 @@ class StructureTester:
                 return "post_warc_meta"
             case WarcState.POST_META:
                 return "post_meta"
+            case _:
+                return "Not Found"
 
     def add_state(self, state, file_line):
         state_str = self.convert_state(state)
@@ -39,12 +42,9 @@ class StructureTester:
                 self.current_line = state_str + "\n"
 
             elif self.current_line != self.base_line:
-                print("ERROR : Different struct found :\n\n")
-                print("Base struct :\n")
-                print(self.base_line)
-                print("\n\nCurrent struct :\n")
-                print(self.current_line)
-                print("\nLast known line in chunk file : " + str(file_line))
+                error("Different struct found :\n\n\nBase struct :\n\n"
+                      + self.base_line + "\n\n\nCurrent struct :\n\n" + self.current_line
+                      + "\n\nLast known line in chunk file : " + str(file_line))
                 exit(1)
             else:
                 self.current_line = state_str + "\n"

@@ -1,8 +1,6 @@
 from pathlib import Path
 from src.query import Query
-import gzip
-import requests
-import time
+from src.logger import error, warn
 
 
 class ChunksParser:
@@ -20,8 +18,8 @@ class ChunksParser:
                 input('Index file for this dataset doesn\'t exist yet. Press enter if you want to download it (~35Mb)')
                 Query.fetch_chunks_indexes(dataset_id)
             except Exception as e:
-                print("Error, probably invalid authentication token : ")
-                print(e)
+                error("Error, probably invalid authentication token : ")
+                error(str(e))
 
         with open(path, 'r') as f:
             self.treat_chunks_file(f)
@@ -35,7 +33,7 @@ class ChunksParser:
             case "crawldiagnostics":
                 self.crawldiagnostics_type += 1
             case _:
-                print("WARNING : unknown file type found : " + type_str)
+                warn("unknown file type found : " + type_str)
 
     def treat_chunks_file(self, f):
         while line := f.readline():

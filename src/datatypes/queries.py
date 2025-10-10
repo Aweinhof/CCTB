@@ -12,8 +12,8 @@ class Queries(str, Enum):
     BASE_TYPO = """
         SELECT url_host_tld, url_host_2nd_last_part
         FROM ccindex.ccindex
-        WHERE url_host_tld = %(1)s
-        and url_host_2nd_last_part like %(2)s
+        WHERE url_host_2nd_last_part like %(1)s
+        and url_host_tld = %(2)s
         and crawl = %(3)s
         GROUP BY url_host_2nd_last_part, url_host_tld
         LIMIT 1000

@@ -52,6 +52,11 @@ def build_parser():
                         action="append",
                         default=[])
 
+    # ----------------------------------- verbosity -----------------------------------
+
+    p.add_argument("-v", action="store_true", help="Verbose, prints errors and warnings")
+    p.add_argument("-vv", action="store_true", help="Very verbose, prints errors, warnings and logs")
+
     # ------------------------------------ chunks -------------------------------------
 
     chunks_p = subparsers.add_parser("chunks", help="Parses a chunks index file to show stats of it")

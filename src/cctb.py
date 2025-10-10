@@ -2,6 +2,8 @@ from src.query import Query
 from src.datatypes.queries import Queries
 from src.datatypes.filter import Filter
 from src.chunk_scanner import ChunkScanner
+import config
+from src.logger import error
 
 
 class CCTB:
@@ -47,7 +49,8 @@ class CCTB:
 
         splitted = hostname.split('.')
         if len(splitted) != 2 or not splitted[0] or not splitted[1]:
-            print("Invalid hostname given, see -h for more info")
+            error("Invalid hostname given, see -h for more info")
             return
 
-        Query.athena(Queries.BASE_TYPO, ['com', 'google'])
+        params = splitted + [config.latest_cc]
+        Query.athena(Queries.BASE_TYPO, params)

@@ -4,6 +4,7 @@ from src.cctb import CCTB
 from src.chunks_parser import ChunksParser
 from src.typo_fuzzer import TypoFuzzer
 from src.routine import routine_check
+import config
 
 
 def find(args):
@@ -38,11 +39,19 @@ def phishing(args):
     cctb.phishing(args.auto, args.hostname)
 
 
+def set_verbosity_level(args):
+    if args.v:
+        config.verbosity = 1
+    elif args.vv:
+        config.verbosity = 2
+
+
 def main(argv=None):
     argv = argv if argv is not None else sys.argv[1:]
     args = build_parser().parse_args(argv)
 
     routine_check()
+    set_verbosity_level(args)
 
     match args.command:
         case "find":

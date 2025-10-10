@@ -2,27 +2,31 @@ from src.query import Query
 from pathlib import Path
 import re
 import time
+import config
+from src.logger import warn, log, error
 
 
 def routine_check():
     """
     This is called at each execution of the script to check if we need to update the latest cc dataset name.
-    The data is stored in '.store/current_crawl'.
+    The data is stored in '.store/current_crawl' and the latest cc name also
+    in the config.py latest_cc variable for easier access at runtime.
     The request to the CC API is done if the file wasn't updated in the 24h.
     The directory and file is automaticaly created if it doesn't exist.
     A user shouldn't ever have to interact with this file.
     """
+
     fn = ".store/current_crawl"
     create_path(fn)
 
     with open(fn, 'r+') as f:
         content = f.read()
         fields = content.strip().split('\n')
-        corrupt_msg = '[Warning] : .store/current_crawl file is corrupted or doesn\'t exist yet. Wiping it and rewriting it...'
+        corrupt_msg = '.store/current_crawl file is corrupted or doesn\'t exist yet. Wiping it and rewriting it...'
 
         # case file is corrupted
         if len(fields) < 2 or not check_crawl_name_format(fields[0]) or not check_time_format(fields[1]):
-            print(corrupt_msg)
+            warn(corrupt_msg)
             update_file(f)
 
         # case file is correct
@@ -33,8 +37,10 @@ def routine_check():
 
             # case we didn't check for more than 24h
             if last_update_time + seconds_24h < current:
-                print('Running daily check for latest CC name...')
+                log('Running daily check for latest CC name...')
                 update_file(f)
+            else:
+                config.latest_cc = fields[0]
 
 
 def create_path(path: str):
@@ -59,11 +65,14 @@ def update_file(f):
     """
     cc_name = Query.crawl_sets()[0]['id']
     current_time = int(time.time())
+    config.latest_cc = cc_name
 
     if not check_crawl_name_format(cc_name):
-        print("[Error] : latest crawl name returned by server seems wrong. Continuing without changing the "
+        error("latest crawl name returned by server seems wrong. Continuing without changing the "
               ".store/current_crawl file. If you want to continue using this tool make sure the first line "
               "of that file is the latest crawl name (ex: CC-MAIN-2025-38) or just fix me :) (update_file in src/routine.py")
+        f.seek(0)
+        config.latest_cc = f.read().strip().split('\n')[0]
 
     f.seek(0)
     f.truncate()
