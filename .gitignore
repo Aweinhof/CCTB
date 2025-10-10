@@ -6,3 +6,4 @@ chunk_indexes
 ssh
 ssh/**
 chunklist
+.store

@@ -2,8 +2,7 @@ import requests
 import json
 from src.datatypes.filter import FilterValue
 from pyathena import connect
-import pandas as pd
-import warnings
+from pyathena.pandas.cursor import PandasCursor
 import boto3
 from pathlib import Path
 
@@ -33,22 +32,21 @@ class Query:
         return indexes
 
     @staticmethod
-    def contact_bucket():
-        warnings.filterwarnings("ignore", message="pandas only supports SQLAlchemy")
-
+    def athena(query, values):
         conn = connect(s3_staging_dir='s3://digit-cc-athena-query-results/',
-                    region_name='us-east-1',
-                    schema_name='ccindex')
+                       region_name='us-east-1',
+                       schema_name='ccindex')
+        cursor = conn.cursor(PandasCursor)
 
-        sql = """
-        SELECT url, url_host_name, warc_filename
-        FROM ccindex.ccindex
-        WHERE url_host_name = 'ulb.be'
-        LIMIT 1
-        """
-    
-        df = pd.read_sql(sql, conn)
-        print(df.head())
+        params = {}
+        for i in range(len(values)):
+            params[str(i + 1)] = values[i]
+
+        df = cursor.execute(query, params).fetchall()
+        print(df)
+        scanned_bytes = cursor.data_scanned_in_bytes or 0
+        print(scanned_bytes)
+        print(f"Data scanned: {scanned_bytes / 1e6:.2f} MB")
 
     @staticmethod
     def fetch_chunks_indexes(id):
@@ -71,4 +69,4 @@ class Query:
 
         with open('chunklist/' + id, 'w') as f:
             for line in warc_files:
-                f.write(line+'\n')
+                f.write(line + '\n')

@@ -1,4 +1,5 @@
 from src.query import Query
+from src.datatypes.queries import Queries
 from src.datatypes.filter import Filter
 from src.chunk_scanner import ChunkScanner
 
@@ -39,5 +40,14 @@ class CCTB:
         scanner = ChunkScanner()
         scanner.scan(path)
 
-    def dev(self):
-        Query.contact_bucket()
+    def phishing(self, auto, hostname):
+        if auto:
+            print("Work in progress")
+            return
+
+        splitted = hostname.split('.')
+        if len(splitted) != 2 or not splitted[0] or not splitted[1]:
+            print("Invalid hostname given, see -h for more info")
+            return
+
+        Query.athena(Queries.BASE_TYPO, ['com', 'google'])

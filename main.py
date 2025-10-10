@@ -3,6 +3,7 @@ import sys
 from src.cctb import CCTB
 from src.chunks_parser import ChunksParser
 from src.typo_fuzzer import TypoFuzzer
+from src.routine import routine_check
 
 
 def find(args):
@@ -27,19 +28,21 @@ def chunks(args):
     p.print()
 
 
-def find_page():
+def scan_chunk(args):
     cctb = CCTB()
-    cctb.scan_chunk('/home/csirc/Workspace/CCTB/junk/warc_type/CC-MAIN-20250905112101-20250905142101-00000.warc')
+    cctb.scan_chunk(args.chunk_path)
 
 
-def dev():
+def phishing(args):
     cctb = CCTB()
-    cctb.dev()
+    cctb.phishing(args.auto, args.hostname)
 
 
 def main(argv=None):
     argv = argv if argv is not None else sys.argv[1:]
     args = build_parser().parse_args(argv)
+
+    routine_check()
 
     match args.command:
         case "find":
@@ -48,11 +51,11 @@ def main(argv=None):
         case "chunks":
             chunks(args)
 
-        case "find_page":
-            find_page()
+        case "scan_chunk":
+            scan_chunk(args)
 
-        case "dev":
-            dev()
+        case "phishing":
+            phishing(args)
 
 
 if __name__ == "__main__":

@@ -4,7 +4,7 @@ import json
 
 def build_parser():
     p = argparse.ArgumentParser(
-        prog="parser.py",
+        prog="python3 main.py",
         description="CTI tool leveraging common crawl database"
     )
 
@@ -58,16 +58,23 @@ def build_parser():
 
     chunks_p.add_argument("dataset_id", help="Name of the dataset, ex : CC-MAIN-2025-38")
 
-    # ----------------------------------- find_page -----------------------------------
+    # ---------------------------------- scan_chunk -----------------------------------
 
-    find_page_p = subparsers.add_parser("find_page", help="Find a regex match in the content of the webpages")
+    find_page_p = subparsers.add_parser("scan_chunk", help="Scan a chunk (currently does nothing)")
 
-    find_page_p.add_argument("regex", help="The regex to match a page")
+    find_page_p.add_argument("chunk_path", help="Path to the chunk to scan")
 
-    # -------------------------------------- dev --------------------------------------
+    # ------------------------------------ fishing -------------------------------------
 
-    dev_p = subparsers.add_parser("dev", help="Developement branch")
+    phishing_p = subparsers.add_parser("phishing", help="Phishy sites buster (typosquatting detection)")
 
-    # dev_p.add_argument("regex", help="The regex to match a page")
+    group = phishing_p.add_mutually_exclusive_group()
+
+    group.add_argument("--auto", action="store_true", help="Automaticly run on the SQL queries stored in config/phishing.sql")
+
+    group.add_argument("hostname",
+                       nargs='?',
+                       help="SQL 'LIKE' syntax in tld + 2nd_last_domain (strict), example : 'g%%gle.com'",
+                       default='')
 
     return p
